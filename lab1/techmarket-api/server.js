@@ -27,9 +27,9 @@ app.use(errorHandler)
 app.use(notFoundHandler)
 
 
-app.get('/home', (req, res) => {
-  res.send('Hello World!')
-})
+// app.get('/home', (req, res) => {
+//   res.send('Hello World!')
+// })
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)

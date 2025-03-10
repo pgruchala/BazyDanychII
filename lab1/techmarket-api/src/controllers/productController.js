@@ -18,7 +18,7 @@ const updateData = (id, updatedData) => {
     if (index !== -1) {
 
       Object.keys(updatedData).forEach(key => {
-        data[index][key] = updatedData[key];
+        data[index][key] = updatedData[key]; // nie powinno byc foreach
       });
       return true;
     }
@@ -29,6 +29,11 @@ const deleteData = (id) => {
   const index = data.findIndex((item) => item.id === id);
   if (index !== -1) {
     data.splice(index, 1);
+    data.forEach((item, i) => {
+      if (i >= index) {
+        item.id--;
+      }
+    });
   }
 };
 
