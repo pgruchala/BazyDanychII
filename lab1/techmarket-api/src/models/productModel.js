@@ -6,7 +6,7 @@ const Products = {
     const params = [];
 
     const { available, sort } = req.query;
-    
+
     if (available) {
       params.push(available === "true");
       sqlQuery += ` WHERE isavailable = $${params.length}`;
@@ -15,7 +15,7 @@ const Products = {
     if (sort) {
       sqlQuery += ` ORDER BY price ${sort === "asc" ? "ASC" : "DESC"}`;
     }
-    
+
     const { rows } = await pool.query(sqlQuery, params);
     return rows;
   },
