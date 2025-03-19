@@ -5,17 +5,20 @@
   "main": "index.js",
   "scripts": {
     "app": "nodemon techmarket-api/server.js",
-    "controller":"nodemon techmarket-api/src/controllers/productController.js"
+    "controller": "nodemon techmarket-api/src/controllers/productController.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "body-parser": "^1.20.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "express-validator": "^7.2.1",
     "http": "^0.0.1-security",
-    "morgan": "^1.10.0"
+    "morgan": "^1.10.0",
+    "pg": "^8.14.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.9"
