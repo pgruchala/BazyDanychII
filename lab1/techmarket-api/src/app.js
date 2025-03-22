@@ -5,6 +5,9 @@ const dotenv = require("dotenv");
 const morgan = require("morgan");
 const { errorHandler } = require("./middleware/errorHandling");
 const productRoutes = require("./routes/productRoutes");
+const categoryRoutes = require("./routes/categoryRoutes");
+
+const userRoutes = require("./routes/userRoutes");
 const requestLogger = require("./middleware/requestLogger");
 
 dotenv.config();
@@ -17,7 +20,9 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(requestLogger);
 
 app.use("/products", productRoutes);
+app.use("/users", userRoutes);
+app.use("/categories",categoryRoutes);
 
 app.use(errorHandler);
 
-module.exports = app
+module.exports = app;

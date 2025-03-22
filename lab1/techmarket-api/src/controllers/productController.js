@@ -26,7 +26,7 @@ const getAllProducts = async (req, res, next) => {
   }
 };
 
-const getProductById = async (req, res) => {
+const getProductById = async (req, res, next) => {
   const id = parseInt(req.params.id);
   try {
     if (isNaN(id)) {
@@ -41,7 +41,7 @@ const getProductById = async (req, res) => {
     if (!product) {
       return res.status(404).json({
         status: "error",
-        message: `Produkt o ID ${productId} nie został znaleziony`,
+        message: `Produkt o ID ${id} nie został znaleziony`,
       });
     }
 
@@ -54,7 +54,7 @@ const getProductById = async (req, res) => {
   }
 };
 
-const createProduct = async (req, res) => {
+const createProduct = async (req, res, next) => {
   try {
     const {
       name,
@@ -67,10 +67,23 @@ const createProduct = async (req, res) => {
       imageUrl,
     } = req.body;
 
+    let categoryRecord = await prisma.category.findFirst({
+      where: { name: category },
+    });
+
+    if (!categoryRecord) {
+      categoryRecord = await prisma.category.create({
+        data: {
+          name: category,
+          description: `Category for ${category} products`,
+        },
+      });
+    }
+
     const newProduct = await prisma.product.create({
       data: {
         name,
-        category,
+        categoryId: categoryRecord.id,
         description,
         price: price !== undefined ? parseFloat(price) : undefined,
         brand,
@@ -89,7 +102,7 @@ const createProduct = async (req, res) => {
   }
 };
 
-const updateProduct = async (req, res) => {
+const updateProduct = async (req, res, next) => {
   try {
     const productId = parseInt(req.params.id);
     const {
@@ -143,7 +156,7 @@ const updateProduct = async (req, res) => {
   }
 };
 
-const deleteProduct = async (req, res) => {
+const deleteProduct = async (req, res, next) => {
   try {
     const productId = parseInt(req.params.id);
     if (isNaN(productId)) {
