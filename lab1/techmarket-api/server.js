@@ -1,27 +1,31 @@
-const express = require("express");
-const app = express();
-const cors = require("cors");
-const dotenv = require("dotenv");
-dotenv.config();
-const morgan = require("morgan");
-const {
-  errorHandler,
-  notFoundHandler,
-} = require("./src/middleware/errorHandling");
+const app = require("./src/app");
+const prisma = require("./src/utils/prisma");
 
-const productRoutes = require("./src/routes/productRoutes");
-const port = process.env.PORT || 3000;
-require("./src/config/db");
+const PORT = process.env.PORT || 3000;
 
-app.use(morgan("dev"));
-app.use(cors());
-app.use(express.json());
+const startServer = async () => {
+  try {
+    // Sprawdź połączenie z bazą danych wykonując zapytanie testowe
+    await prisma.$queryRaw`SELECT 1`;
+    console.log("Połączenie z bazą danych zostało pomyślnie nawiązane.");
 
-app.use("/products", productRoutes);
+    // Uruchomienie serwera Express
+    app.listen(PORT, () => {
+      console.log(`Serwer działa na porcie ${PORT}`);
+      console.log(`API dostępne pod adresem http://localhost:${PORT}/products`);
+    });
+  } catch (error) {
+    console.error("Nie można uruchomić serwera:", error);
+    await prisma.$disconnect();
+    process.exit(1);
+  }
+};
 
-app.use(errorHandler);
-app.use(notFoundHandler);
-
-app.listen(port, () => {
-  console.log("🚀 Serwer działa na porcie 3000");
+// Obsługa czystego zamknięcia
+process.on("SIGINT", async () => {
+  console.log("Zamykanie połączenia z bazą danych...");
+  await prisma.$disconnect();
+  process.exit(0);
 });
+
+startServer();

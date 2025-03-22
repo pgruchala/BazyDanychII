@@ -1,69 +1,175 @@
-const Products = require("../models/productModel");
+const prisma = require("../utils/prisma");
 
-const getAllProducts = async (req, res) => {
+const getAllProducts = async (req, res, next) => {
   try {
-    const products = await Products.getAll(req);
-    res.status(200).json(products);
+    const { available, sort } = req.query;
+    const where = {};
+    if (available) {
+      where.isAvailable = available === "true";
+    }
+    const orderBy = {};
+    if (sort) {
+      orderBy.price = sort === "asc" ? "asc" : "desc";
+    } else {
+      orderBy.createdAt = "desc";
+    }
+
+    const products = await prisma.product.findMany({ where, orderBy });
+
+    res.status(200).json({
+      status: "success",
+      count: products.length,
+      data: products,
+    });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    next(error);
   }
 };
 
 const getProductById = async (req, res) => {
   const id = parseInt(req.params.id);
   try {
-    const product = await Products.getById(id);
-    if (!product) {
-      return res
-        .status(404)
-        .json({ message: `Product with ID ${id} not found` });
+    if (isNaN(id)) {
+      return res.status(400).json({
+        status: "error",
+        message: "ID produktu musi być liczbą",
+      });
     }
-    res.status(200).json(product);
+
+    const product = await prisma.product.findUnique({ where: { id: id } });
+
+    if (!product) {
+      return res.status(404).json({
+        status: "error",
+        message: `Produkt o ID ${productId} nie został znaleziony`,
+      });
+    }
+
+    res.status(200).json({
+      status: "success",
+      data: product,
+    });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    next(error);
   }
 };
 
 const createProduct = async (req, res) => {
-  const newProduct = req.body;
   try {
-    const createdProduct = await Products.create(newProduct);
-    res.status(201).json(createdProduct);
+    const {
+      name,
+      category,
+      description,
+      price,
+      brand,
+      stockCount,
+      isAvailable,
+      imageUrl,
+    } = req.body;
+
+    const newProduct = await prisma.product.create({
+      data: {
+        name,
+        category,
+        description,
+        price: price !== undefined ? parseFloat(price) : undefined,
+        brand,
+        stockCount: stockCount !== undefined ? parseInt(stockCount) : 0,
+        isAvailable: isAvailable !== undefined ? isAvailable : true,
+        imageUrl,
+      },
+    });
+    res.status(201).json({
+      status: "success",
+      message: "Produkt został utworzony pomyślnie",
+      data: newProduct,
+    });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    next(error);
   }
 };
 
 const updateProduct = async (req, res) => {
-  const id = parseInt(req.params.id);
-  const updatedData = req.body;
   try {
-    const updatedProduct = await Products.update(id, updatedData);
-    if (!updatedProduct) {
-      return res
-        .status(404)
-        .json({ message: `Product with ID ${id} not found` });
+    const productId = parseInt(req.params.id);
+    const {
+      name,
+      category,
+      description,
+      price,
+      brand,
+      stockCount,
+      isAvailable,
+      imageUrl,
+    } = req.body;
+
+    if (isNaN(productId)) {
+      return res.status(400).json({
+        status: "error",
+        message: "ID produktu musi być liczbą",
+      });
     }
-    res.status(200).json(updatedProduct);
+    const existingProduct = await prisma.product.findUnique({
+      where: { id: productId },
+    });
+
+    if (!existingProduct) {
+      return res.status(404).json({
+        status: "error",
+        message: `Produkt o ID ${productId} nie został znaleziony`,
+      });
+    }
+    const updatedProduct = await prisma.product.update({
+      where: { id: productId },
+      data: {
+        name: name !== undefined ? name : undefined,
+        category: category !== undefined ? category : undefined,
+        description: description !== undefined ? description : undefined,
+        price: price !== undefined ? parseFloat(price) : undefined,
+        brand: brand !== undefined ? brand : undefined,
+        stockCount: stockCount !== undefined ? parseInt(stockCount) : undefined,
+        isAvailable: isAvailable !== undefined ? isAvailable : undefined,
+        imageUrl: imageUrl !== undefined ? imageUrl : undefined,
+      },
+    });
+
+    return res.status(200).json({
+      status: "success",
+      message: "Produkt został pomyślnie zaktualizowany",
+      data: updatedProduct,
+    });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    next(error);
   }
 };
 
 const deleteProduct = async (req, res) => {
-  const id = parseInt(req.params.id);
   try {
-    const success = await Products.delete(id);
-    if (!success) {
-      return res
-        .status(404)
-        .json({ message: `Product with ID ${id} not found` });
+    const productId = parseInt(req.params.id);
+    if (isNaN(productId)) {
+      return res.status(400).json({
+        status: "error",
+        message: "ID produktu musi być liczbą",
+      });
     }
-    res
-      .status(200)
-      .json({ message: `Product with ID ${id} deleted successfully` });
+    const existingProduct = await prisma.product.findUnique({
+      where: { id: productId },
+    });
+    if (!existingProduct) {
+      return res.status(404).json({
+        status: "error",
+        message: `Produkt o id ${productId} nie istnieje`,
+      });
+    }
+    await prisma.product.delete({
+      where: { id: productId },
+    });
+    res.status(200).json({
+      status: "success",
+      message: `Produkt o ID ${productId} został pomyślnie usunięty`,
+    });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    next(error);
   }
 };
 
