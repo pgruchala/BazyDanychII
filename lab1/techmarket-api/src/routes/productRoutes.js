@@ -2,7 +2,10 @@ const express = require("express");
 const router = express.Router();
 const productController = require("../controllers/productController");
 const reviewController = require("../controllers/reviewController");
-const productValidationRules = require("../middleware/validationMiddleware");
+const {
+  productValidationRules,
+  reviewValidationRules,
+} = require("../middleware/validationMiddleware");
 
 router
   .route("/")
@@ -17,12 +20,15 @@ router
 
 router
   .route("/:productId/reviews")
-  .get(reviewController.getReviewsByProductId)
-  .post(reviewController.createReview)
+  .get(
+    reviewValidationRules.getByProductId,
+    reviewController.getReviewsByProductId
+  )
+  .post(reviewValidationRules.create, reviewController.createReview);
 
 router
   .route("/:productId/reviews/:reviewId")
-  .patch(reviewController.updateReview)
-  .delete(reviewController.removeReview)
+  .patch(reviewValidationRules.update, reviewController.updateReview)
+  .delete(reviewValidationRules.delete, reviewController.removeReview);
 
 module.exports = router;
