@@ -1,6 +1,12 @@
 const { body, param, query } = require("express-validator");
 const { validationResult } = require("express-validator");
 const { user } = require("../utils/prisma");
+const {
+  addToCart,
+  updateCartItem,
+  removeFromCart,
+  getCart,
+} = require("../controllers/cartController");
 
 const validateRequest = (req, res, next) => {
   const errors = validationResult(req);
@@ -188,11 +194,7 @@ const userValidationRules = {
       .notEmpty()
       .trim()
       .isLength({ min: 3, max: 50 })
-      .withMessage("Username must be between 3 and 50 characters")
-      .matches(/^[a-zA-Z0-9_]+$/)
-      .withMessage(
-        "Username must contain only letters, numbers, and underscores"
-      ),
+      .withMessage("Username must be between 3 and 50 characters"),
     body("email")
       .notEmpty()
       .isEmail()
@@ -247,9 +249,47 @@ const userValidationRules = {
   ],
 };
 
+const cartValidationRules = {
+  addToCart: [
+    param("userId")
+      .isInt({ min: 1 })
+      .withMessage("User ID must be a positive number"),
+    body("productId")
+      .isInt({ min: 1 })
+      .withMessage("Product ID must be a positive number"),
+    body("quantity")
+      .optional()
+      .isInt({ min: 1 })
+      .withMessage("Quantity must be at least 1"),
+    validateRequest,
+  ],
+  updateCartItem: [
+    param("cartItemId")
+      .isInt({ min: 1 })
+      .withMessage("Cart Item ID must be a positive number"),
+    body("quantity")
+      .isInt({ min: 1 })
+      .withMessage("Quantity must be at least 1"),
+    validateRequest,
+  ],
+  removeFromCart: [
+    param("cartItemId")
+      .isInt({ min: 1 })
+      .withMessage("Cart Item ID must be a positive number"),
+    validateRequest,
+  ],
+  getCart: [
+    param("userId")
+      .isInt({ min: 1 })
+      .withMessage("User ID must be a positive number"),
+    validateRequest,
+  ],
+};
+
 module.exports = {
   productValidationRules,
   categoryValidationRules,
   reviewValidationRules,
   userValidationRules,
+  cartValidationRules,
 };

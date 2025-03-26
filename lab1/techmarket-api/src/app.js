@@ -6,6 +6,7 @@ const morgan = require("morgan");
 const { errorHandler } = require("./middleware/errorHandling");
 const productRoutes = require("./routes/productRoutes");
 const categoryRoutes = require("./routes/categoryRoutes");
+const cartRoutes = require("./routes/cartRoutes");
 
 const userRoutes = require("./routes/userRoutes");
 const requestLogger = require("./middleware/requestLogger");
@@ -21,7 +22,8 @@ app.use(requestLogger);
 
 app.use("/products", productRoutes);
 app.use("/users", userRoutes);
-app.use("/categories",categoryRoutes);
+app.use("/categories", categoryRoutes);
+app.use("/cart", cartRoutes);
 
 app.use(errorHandler);
 

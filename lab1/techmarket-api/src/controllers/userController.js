@@ -36,6 +36,7 @@ const getUserByUsername = async (req, res, next) => {
         firstName: true,
         lastName: true,
         reviews: true,
+        cart: true,
       },
     });
 
