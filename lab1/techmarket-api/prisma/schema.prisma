@@ -14,18 +14,19 @@ datasource db {
 }
 
 model Product {
-  id          Int      @id @default(autoincrement())
+  id          Int        @id @default(autoincrement())
   name        String
   categoryId  Int
-  description String?  @db.Text
-  price       Decimal  @db.Decimal(10, 2)
-  stockCount  Int      @default(0)
+  description String?    @db.Text
+  price       Decimal    @db.Decimal(10, 2)
+  stockCount  Int        @default(1)
   brand       String
   imageUrl    String?
-  isAvailable Boolean  @default(true)
-  createdAt   DateTime @default(now()) @db.Timestamptz
-  reviews     Review[] @relation("ProductReviews")
-  category    Category @relation("ProductCategories", fields: [categoryId], references: [id])
+  isAvailable Boolean    @default(true)
+  createdAt   DateTime   @default(now()) @db.Timestamptz
+  reviews     Review[]   @relation("ProductReviews")
+  category    Category   @relation("ProductCategories", fields: [categoryId], references: [id])
+  cartitem    CartItem[] @relation("ProductCart")
 }
 
 model Category {
@@ -53,4 +54,22 @@ model User {
   firstName    String
   lastName     String
   reviews      Review[] @relation("UserReviews")
+  cart         Cart?    @relation("UserCart")
+}
+
+model CartItem {
+  id        Int      @id @default(autoincrement())
+  productId Int
+  quantity  Int      @default(1)
+  addedAt   DateTime @default(now()) @db.Timestamptz
+  cartId    Int
+  product   Product  @relation("ProductCart", fields: [productId], references: [id])
+  Cart      Cart     @relation(fields: [cartId], references: [id])
+}
+
+model Cart {
+  id     Int        @id @default(autoincrement())
+  userId Int        @unique
+  items  CartItem[] @relation()
+  user   User       @relation("UserCart", fields: [userId], references: [id])
 }

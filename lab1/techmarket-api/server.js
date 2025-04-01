@@ -7,7 +7,7 @@ const startServer = async () => {
   try {
     // Sprawdź połączenie z bazą danych wykonując zapytanie testowe
     await prisma.$queryRaw`SELECT 1`;
-    console.log("Połączenie z bazą danych zostało pomyślnie nawiązane.");
+    console.log("Połączenie z bazą danych SQL zostało pomyślnie nawiązane.");
 
     // Uruchomienie serwera Express
     app.listen(PORT, () => {
