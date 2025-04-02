@@ -7,7 +7,7 @@ const { errorHandler } = require("./middleware/errorHandling");
 const productRoutes = require("./routes/productRoutes");
 const categoryRoutes = require("./routes/categoryRoutes");
 const cartRoutes = require("./routes/cartRoutes");
-
+const reviewRoutes = require("./routes/reviewRoutes");
 const userRoutes = require("./routes/userRoutes");
 const requestLogger = require("./middleware/requestLogger");
 
@@ -24,6 +24,7 @@ app.use("/products", productRoutes);
 app.use("/users", userRoutes);
 app.use("/categories", categoryRoutes);
 app.use("/cart", cartRoutes);
+app.use("/reviews", reviewRoutes);
 
 app.use(errorHandler);
 

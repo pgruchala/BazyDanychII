@@ -1,7 +1,7 @@
 const Joi = require('joi')
 
 const reviewSchema = Joi.object({
-    productId: Joi.number().integer().positive().required(),
+    // productId: Joi.number().integer().positive().required(),
     userId: Joi.number().integer().positive().required(),
     rating: Joi.number().integer().min(1).max(5).required(),
     title:Joi.string().min(3).max(64).required(),
