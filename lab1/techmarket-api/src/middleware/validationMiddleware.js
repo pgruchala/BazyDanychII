@@ -7,6 +7,8 @@ const {
   removeFromCart,
   getCart,
 } = require("../controllers/cartController");
+const { reviewSchema } = require("../../mongo/productSchema");
+
 
 const validateRequest = (req, res, next) => {
   const errors = validationResult(req);
@@ -147,46 +149,6 @@ const categoryValidationRules = {
   ],
 };
 
-const reviewValidationRules = {
-  getByProductId: [
-    param("productId").isInt({ min: 1 }).withMessage("Invalid product ID"),
-    validateRequest,
-  ],
-  create: [
-    param("productId").isInt({ min: 1 }).withMessage("Invalid product ID"),
-    body("userId")
-      .isInt({ min: 1 })
-      .withMessage("User ID must be a positive number"),
-    body("rating")
-      .isInt({ min: 1, max: 5 })
-      .withMessage("Rating must be a number between 1 and 5"),
-    body("comment")
-      .optional()
-      .trim()
-      .isLength({ max: 1000 })
-      .withMessage("Comment cannot exceed 1000 characters"),
-    validateRequest,
-  ],
-  delete: [
-    param("productId").isInt({ min: 1 }).withMessage("Invalid product ID"),
-    param("reviewId").isInt({ min: 1 }).withMessage("Invalid review ID"),
-    validateRequest,
-  ],
-  update: [
-    param("productId").isInt({ min: 1 }).withMessage("Invalid product ID"),
-    param("reviewId").isInt({ min: 1 }).withMessage("Invalid review ID"),
-    body("rating")
-      .optional()
-      .isInt({ min: 1, max: 5 })
-      .withMessage("Rating must be a number between 1 and 5"),
-    body("comment")
-      .optional()
-      .trim()
-      .isLength({ max: 1000 })
-      .withMessage("Comment cannot exceed 1000 characters"),
-    validateRequest,
-  ],
-};
 
 const userValidationRules = {
   create: [
@@ -285,11 +247,26 @@ const cartValidationRules = {
     validateRequest,
   ],
 };
+const  validateMongoRequest = (schema, property) => {
+  return (req, res, next) => {
+    const { error } = schema.validate(req[property]);
+    
+    if (error) {
+      return res.status(400).json({
+        message: 'Validation error',
+        details: error.details.map(detail => detail.message)
+      });
+    }
+    
+    next();
+  };
+}
+
 
 module.exports = {
   productValidationRules,
   categoryValidationRules,
-  reviewValidationRules,
   userValidationRules,
   cartValidationRules,
+  validateMongoRequest
 };

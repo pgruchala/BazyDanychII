@@ -20,6 +20,7 @@
     "express-validator": "^7.2.1",
     "http": "^0.0.1-security",
     "jest": "^29.7.0",
+    "joi": "^17.13.3",
     "mongodb": "^6.15.0",
     "mongoose": "^8.12.2",
     "morgan": "^1.10.0",

@@ -24,7 +24,6 @@ model Product {
   imageUrl    String?
   isAvailable Boolean    @default(true)
   createdAt   DateTime   @default(now()) @db.Timestamptz
-  reviews     Review[]   @relation("ProductReviews")
   category    Category   @relation("ProductCategories", fields: [categoryId], references: [id])
   cartitem    CartItem[] @relation("ProductCart")
 }
@@ -36,25 +35,14 @@ model Category {
   products    Product[] @relation("ProductCategories")
 }
 
-model Review {
-  id        Int     @id @default(autoincrement())
-  productId Int
-  userId    Int
-  rating    Int
-  comment   String
-  product   Product @relation("ProductReviews", fields: [productId], references: [id])
-  user      User    @relation("UserReviews", fields: [userId], references: [id])
-}
-
 model User {
-  id           Int      @id @default(autoincrement())
-  username     String   @unique
-  email        String   @unique
+  id           Int    @id @default(autoincrement())
+  username     String @unique
+  email        String @unique
   passwordHash String
   firstName    String
   lastName     String
-  reviews      Review[] @relation("UserReviews")
-  cart         Cart?    @relation("UserCart")
+  cart         Cart?  @relation("UserCart")
 }
 
 model CartItem {

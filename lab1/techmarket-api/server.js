@@ -1,3 +1,4 @@
+const { connectToDatabase } = require("./mongo");
 const app = require("./src/app");
 const prisma = require("./src/utils/prisma");
 
@@ -8,7 +9,7 @@ const startServer = async () => {
     // Sprawdź połączenie z bazą danych wykonując zapytanie testowe
     await prisma.$queryRaw`SELECT 1`;
     console.log("Połączenie z bazą danych SQL zostało pomyślnie nawiązane.");
-
+    await connectToDatabase();
     // Uruchomienie serwera Express
     app.listen(PORT, () => {
       console.log(`Serwer działa na porcie ${PORT}`);
